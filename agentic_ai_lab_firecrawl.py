@@ -1,7 +1,7 @@
 import ollama
 import requests
 from fpdf import FPDF
-import json
+from datetime import datetime
 
 FIRECRAWL_API_KEY = 'fc-326caceedd674ba1968bf40868618c82'
 FIRECRAWL_URL = "https://api.firecrawl.dev/v1/scrape"
@@ -45,16 +45,27 @@ def process_with_llm(content):
     return response['message']['content']
 
 def generate_pdf(content, filename="agentic_ai_summary.pdf"):
+    new_filename = input("Enter a name to give the pdf: ")
+    while new_filename.strip() == "":
+        new_filename = input("Enter a name to give the pdf: ")
+    if not new_filename.endswith(".pdf"):
+        new_filename = new_filename + ".pdf"
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
+
+    current_datetime = datetime.now()
+    formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    
+    pdf.multi_cell(0, 10, formatted_datetime)
+
 
     lines = content.split("\n")
     for line in lines:
         pdf.multi_cell(0,10,line)
 
-    pdf.output(filename)
-    print(f'PDF report generated: {filename}')
+    pdf.output(new_filename)
+    print(f'PDF report generated: {new_filename}')
 
 def main():
     print("=== Agentic AI Lab: Firecrawl + Offline LLM + PDF Generator ===")
